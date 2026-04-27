@@ -1,4 +1,5 @@
 import { Worker } from 'bullmq'
+import { env } from '../config/env.js'
 import { redisConnection } from '../queues/connection.js'
 import { queueNames } from '../queues/names.js'
 import {
@@ -13,6 +14,13 @@ import {
   processSyncTariffs,
   processSyncWarehouses,
 } from './processors.js'
+
+if (!env.REDIS_ENABLED || !redisConnection) {
+  console.log(
+    'Redis disabled (set REDIS_ENABLED=true and run Redis for background jobs). Worker process exiting.',
+  )
+  process.exit(0)
+}
 
 const processors = {
   'sync-products': processSyncProducts,

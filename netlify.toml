@@ -1,0 +1,12 @@
+# https://docs.netlify.com/configure-builds/file-based-configuration/
+# Monorepo: build only the Vite app from /frontend; publish = dist inside that base.
+
+[build]
+  base = "frontend"
+  command = "npm run build"
+  publish = "dist"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

@@ -1,12 +1,24 @@
 import { Queue } from 'bullmq'
+import { env } from '../config/env.js'
 import { redisConnection } from './connection.js'
 import { queueNames } from './names.js'
 
-export const queues = Object.fromEntries(
-  queueNames.map((name) => [name, new Queue(name, { connection: redisConnection })]),
-)
+function buildQueues() {
+  if (!env.REDIS_ENABLED || !redisConnection) {
+    return Object.fromEntries(queueNames.map((name) => [name, null]))
+  }
+  return Object.fromEntries(
+    queueNames.map((name) => [name, new Queue(name, { connection: redisConnection })]),
+  )
+}
+
+export const queues = buildQueues()
 
 export async function enqueueDefaultJobs() {
+  if (!env.REDIS_ENABLED || !redisConnection) {
+    console.warn('enqueueDefaultJobs: Redis disabled; nothing enqueued.')
+    return
+  }
   await queues['sync-products'].add('sync-products-now', {}, { removeOnComplete: true })
   await queues['sync-warehouses'].add('sync-warehouses-now', {}, { removeOnComplete: true })
   await queues['sync-stocks'].add('sync-stocks-now', {}, { removeOnComplete: true })
