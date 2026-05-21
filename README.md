@@ -29,6 +29,20 @@ cp backend/.env.example backend/.env
 - `DATABASE_URL` (если нужен PostgreSQL)
 - `USE_MOCK_DB=true|false` (`true` по умолчанию для локального демо)
 
+## Deploy frontend to Netlify
+
+Фронтенд вызывает API по путям `/api/*`. Для продакшна на Netlify в проекте настроен прокси:
+
+- `/api/*` -> `/.netlify/functions/api/:splat` -> ваш backend
+
+Чтобы авторизация и кабинет работали на проде, в настройках Netlify добавьте env:
+
+- `API_BASE_URL=https://<your-backend-domain>`
+
+Пример:
+
+- `API_BASE_URL=https://malogist-api.onrender.com`
+
 ## Архитектурный каркас MVP
 
 - API: Express с модульными роутами (`auth/accounts/products/stocks/sales/forecast/recommendations/notifications`)
